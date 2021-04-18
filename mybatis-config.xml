@@ -15,7 +15,7 @@
  <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
  <property name="url" value="jdbc:mysql://150.158.175.133:3306/faithdb?useSSL=false&amp;serverTimezone=UTC"/>
  <property name="username" value="root"/>
- <property name="password" value="xyf12138"/>
+ <property name="password" value="*******"/>
  </dataSource>
  </environment>
  </environments>
