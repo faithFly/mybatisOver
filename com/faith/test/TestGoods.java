@@ -1,1 +1,308 @@
-package com.faith.test;import java.util.*;import com.faith.dao.*;import com.faith.entity.GoodsType;import com.faith.entity.orderDetails;import org.apache.ibatis.session.SqlSession;import com.faith.entity.Goods;import com.faith.utils.MyBatisUtil;import java.math.BigDecimal;public class TestGoods {public static void main(String [] args){	//searchGoodsFromDetails();	searchOrderbyGoodsId();//findeAllGoods();//findGoodsById();	//insertGoods();//	updateGoods();	//deleteGoods();      //likeSelectGoods(); 	//searchGoodsIf();	//searchGoodsWhere();	//searchGoodsMap();	//searchGoodsByPage();	//???????????//	System.out.println("??????????");//	selectAllGoods();	//findGoodsByTid();	//searchGoodsJoinGoodsType();}//??????id??????????public static void findGoodsById() {	Scanner input =new Scanner(System.in);	System.out.println("?????????????????????");	int gid=input.nextInt();	IGoodsDao goodDao=new GoodsDaoImpl();    Goods goods=goodDao.findGoodsById(gid);    System.out.println(goods.toString());   }//?????????????public static void findeAllGoods() {    IGoodsDao goodDao=new GoodsDaoImpl();	List<Goods> sList=goodDao.findAllGoods();	for(int i=0;i<sList.size();i++) {	System.out.println(sList.get(i).toString());	}}//?????????????public static void insertGoods() {	IGoodsDao goodDao=new GoodsDaoImpl();	Goods goods=new Goods();	goods.setGname("ipad");	BigDecimal aDouble =new BigDecimal(5000.00);	goods.setGprice(aDouble);	goods.setGquantity("700");	int count=goodDao.addOneGoods(goods);	if(count>0) {		 System.out.println("??????????");		 System.out.println("???????????????"+goods.getGid());	}}//?????????public static void updateGoods() {	IGoodsDao goodDao=new GoodsDaoImpl();	Scanner input =new Scanner(System.in);	System.out.println("????????????????????");	int gid=input.nextInt();	Goods goods=goodDao.findGoodsById(gid);	if(goods!=null) {		System.out.println("????????????????");		System.out.println(goods.toString());		System.out.println("???????????????????????");		String gname=input.next();		System.out.println("????????????????????");		BigDecimal gprice=input.nextBigDecimal();		System.out.println("????????????????????????");		String gquantity=input.next();		goods=new Goods();		goods.setGname(gname);		goods.setGprice(gprice);		goods.setGquantity(gquantity);		goods.setGid(gid);	    goodDao.updateGoods(goods);	}else {		System.out.println("????????????");	}}//?????????public static void deleteGoods() {	IGoodsDao goodDao=new GoodsDaoImpl();	Scanner input =new Scanner(System.in);	System.out.println("?????????????????????");	int gid=input.nextInt();	Goods goods=goodDao.findGoodsById(gid);	if(goods!=null) {		int count=goodDao.deleteGoods(gid);		if(count>0) {			System.out.println("????????");		}	}else {		System.out.println("????????????");	}}//??????public static void likeSelectGoods() {	IGoodsDao goodDao=new GoodsDaoImpl();	Scanner input =new Scanner(System.in);	System.out.println("????????????????????????");	String name=input.next();	List<Goods> list=goodDao.selectLikeGoods(name);	//java lambda???????	//	list.forEach(item->{	//		System.out.println(item);	//	});	//for???	for(int i=0;i<list.size();i++) {		System.out.println(list.get(i).toString());	}}//??????public static void searchGoodsIf() {	IGoodsDao goodDao=new GoodsDaoImpl();	Goods goods=new Goods();	Scanner input =new Scanner(System.in);	System.out.println("????????????????????????(????????)");	goods.setGname(input.nextLine());	System.out.println("?????????????????????????(????????)");	goods.setGquantity(input.nextLine());	System.out.println("?????????????????????(????????)");	goods.setGprice(input.nextBigDecimal());	List<Goods> list=goodDao.searchGoodsIf(goods);	for(int i=0;i<list.size();i++) {		System.out.println(list.get(i).toString());	}}//where ??????public static void searchGoodsWhere() {	IGoodsDao goodDao=new GoodsDaoImpl();	Goods goods=new Goods();	Scanner input =new Scanner(System.in);	System.out.println("????????????????????????(????????)");	goods.setGname(input.nextLine());	System.out.println("?????????????????????????(????????)");	goods.setGquantity(input.nextLine());	System.out.println("?????????????????????(????????)");	goods.setGprice(input.nextBigDecimal());	List<Goods> list=goodDao.searchGoodsWhere(goods);	for(int i=0;i<list.size();i++) {		System.out.println(list.get(i).toString());	}}//map??????????public static void searchGoodsMap() {	IGoodsDao goodDao=new GoodsDaoImpl();	Map<String,Object> map=new HashMap<String,Object>();	Scanner input =new Scanner(System.in);	System.out.println("????????????????????????(????????)");	map.put("gname", input.nextLine());	System.out.println("?????????????????????????(????????)");	map.put("gquantity", input.nextLine());	System.out.println("?????????????????????????(??0????)");	map.put("priceStart", input.nextInt());	System.out.println("????????????????????????(??0????)");	map.put("priceEnd", input.nextInt());	List<Goods> list=goodDao.searchGoodsMap(map);	for(int i=0;i<list.size();i++) {		System.out.println(list.get(i).toString());	}	}//??????public static void searchGoodsByPage() {	Scanner input =new Scanner(System.in);	System.out.println("??????????????");	int pageSize=input.nextInt();	System.out.println("??????????????");	int pageIndex=input.nextInt();    Map map=new HashMap();    //?????????    int startRow=(pageIndex-1)*pageSize;    map.put("startRow", startRow);    map.put("pageSize", pageSize);    IGoodsDao goodsDao=new GoodsDaoImpl();    List<Goods> list=goodsDao.searchGoodsByPage(map);    list.forEach(item->System.out.println(item));    	    }//????????public static void selectAllGoods() {	SqlSession session=MyBatisUtil.getSession();	IGoodsDao goodsDao=session.getMapper(IGoodsDao.class);	List<Goods> slist=goodsDao.findAllGoods();	for(int i=0;i<slist.size();i++) {		System.out.println(slist.get(i).toString());	}}//²éÑ¯Àà±ğ±íÊ±Í¬Ê±Êä³öÆäÉÌÆ·	public static void findGoodsByTid(){		IGoodsTypeDao goodsTypeDao=new GoodsTypeDaoImpl();		List<GoodsType> list=new ArrayList<GoodsType>();		list=goodsTypeDao.findGoodsById();		//System.out.println("ÉÌÆ·ÀàĞÍ±àºÅ£º"+myGoods.getTid()+"ÀàĞÍÃû³Æ"+myGoods.getTname());		//List<Goods> sList=myGoods.getGoods();		//for (int i = 0; i < sList.size(); i++) {		//	System.out.println(sList.get(i).toString());		//}		//System.out.println("ÉÌÆ·ÀàĞÍ±àºÅ£º"+list.get(0).getTid()+"    ÀàĞÍÃû³Æ: "+list.get(0).getTname());		for(int i = 0; i < list.size(); i++){			System.out.println("ÉÌÆ·ÀàĞÍ±àºÅ£º"+list.get(i).getTid()+"    ÀàĞÍÃû³Æ: "+list.get(i).getTname());			//Ñ­»·3´Î			for(int j=0;j<list.get(i).getGoods().size();j++){				//»ñµÃµÚÒ»¸ögoods¼¯ºÏ				List<Goods> sList=list.get(i).getGoods();				System.out.println(sList.get(j).toString());			}		}	}//²éÑ¯ÉÌÆ·±íÊ±Í¬Ê±Êä³öÆäÉÌÆ·ÀàĞÍpublic static void searchGoodsJoinGoodsType(){		IGoodsDao goodsDao=new GoodsDaoImpl();		List<Goods> list=new ArrayList<Goods>();		list=goodsDao.searchGoodsJoinGoodsType();		for (int i = 0; i < list.size(); i++) {			//System.out.printf(list.get(i).toString());			System.out.println("ÉÌÆ·idÎª£º"+list.get(i).getGid()+" ÉÌÆ·Ãû³Æ:"+list.get(i).getGname()+"  ÉÌÆ·¼Û¸ñÎª£º"+					"  ÉÌÆ·ÊıÁ¿Îª£º"+list.get(i).getGquantity()+"  ÉÌÆ·Àà±ğ±àºÅÎª£º"+list.get(i).getGtype());			for (int j = 0; j < list.get(i).getGoodsTypesType().size(); j++) {				//»ñµÃµÚÒ»¸ögoodsType¼¯ºÏ				List<GoodsType> slist=list.get(i).getGoodsTypesType();				System.out.println("Àà±ğÃû³ÆÎª£º"+slist.get(j).getTname());			}		}	}//²éÑ¯1ºÅ¶©µ¥µÄËùÓĞ¶ÔÓ¦µÄÉÌÆ·	public static  void searchGoodsFromDetails(){		System.out.println("ÇëÊäÈëÄãÒª²éÑ¯¶©µ¥µÄ¶©µ¥ºÅ£¡");	    Scanner scan=new Scanner(System.in);	    int orderId=scan.nextInt();	    SqlSession session=MyBatisUtil.getSession();		OrderDetailsDao orderDao=session.getMapper(OrderDetailsDao.class);        List<orderDetails> orderDetailsList=orderDao.searchGoodsByDetail(orderId);		System.out.println("²éÑ¯µ½"+orderId+"ºÅ¶©µ¥µÄÉÌÆ·ÓĞ£º");         List<Goods> goodsList=orderDetailsList.get(0).getGoods();			for (int i = 0; i < goodsList.size(); i++) {				System.out.println(" ÉÌÆ·Ãû³Æ:"+goodsList.get(i).getGname()+						"  ÉÌÆ·¼Û¸ñÎª£º"+goodsList.get(i).getGprice()+						"  ÉÌÆ·ÊıÁ¿Îª£º"+goodsList.get(i).getGquantity());				for (int j = 0; j < goodsList.get(i).getGoodsTypesType().size(); j++) {					//»ñµÃµÚÒ»¸ögoodsType¼¯ºÏ					List<GoodsType> slist=goodsList.get(j).getGoodsTypesType();					System.out.println("Àà±ğÃû³ÆÎª£º"+slist.get(j).getTname());				}			}	}	//²éÑ¯¶©µ¥Ìõ¼şÎªÉÌÆ·±àºÅ	public static  void searchOrderbyGoodsId(){		System.out.println("ÇëÊäÈëÄãÒª²éÑ¯µÄÉÌÆ·¶©µ¥£¡");		Scanner scan=new Scanner(System.in);		int goodsId=scan.nextInt();		SqlSession session=MyBatisUtil.getSession();		OrderDetailsDao orderDao=session.getMapper(OrderDetailsDao.class);		List<orderDetails> orderDetailsList=orderDao.searchOrderbyGoodsId(goodsId);		if (orderDetailsList.size()<1){			System.out.println("Î´ÄÜ²éµ½Ïà¶ÔÓ¦µÄ¶©µ¥ºÅ");		}else {			System.out.println("²éµ½Ïà¶ÔÓ¦µÄ¶©µ¥ºÅÎª£º");			for (int i = 0; i < orderDetailsList.size(); i++) {				System.out.println(orderDetailsList.get(i).getOrderDetails_Orderid());			}		}	}}
+package com.faith.test;
+import java.util.*;
+import com.faith.dao.*;
+import com.faith.entity.GoodsType;
+import com.faith.entity.orderDetails;
+import org.apache.ibatis.session.SqlSession;
+import com.faith.entity.Goods;
+import com.faith.utils.MyBatisUtil;
+import java.math.BigDecimal;
+public class TestGoods {
+public static void main(String [] args){
+	//searchGoodsFromDetails();
+	searchOrderbyGoodsId();
+//findeAllGoods();
+//findGoodsById();
+	//insertGoods();
+//	updateGoods();
+	//deleteGoods();
+      //likeSelectGoods();
+ 	//searchGoodsIf();
+	//searchGoodsWhere();
+	//searchGoodsMap();
+	//searchGoodsByPage();
+	//???????????
+//	System.out.println("??????????");
+//	selectAllGoods();
+	//findGoodsByTid();
+	//searchGoodsJoinGoodsType();
+}
+
+//??????id??????????
+public static void findGoodsById() {
+	Scanner input =new Scanner(System.in);
+	System.out.println("?????????????????????");
+	int gid=input.nextInt();
+	IGoodsDao goodDao=new GoodsDaoImpl();
+    Goods goods=goodDao.findGoodsById(gid);
+    System.out.println(goods.toString());
+   
+}
+//?????????????
+public static void findeAllGoods() {
+    IGoodsDao goodDao=new GoodsDaoImpl();
+	List<Goods> sList=goodDao.findAllGoods();
+	for(int i=0;i<sList.size();i++) {
+	System.out.println(sList.get(i).toString());
+	}
+}
+//?????????????
+public static void insertGoods() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Goods goods=new Goods();
+	goods.setGname("ipad");
+	BigDecimal aDouble =new BigDecimal(5000.00);
+	goods.setGprice(aDouble);
+	goods.setGquantity("700");
+	int count=goodDao.addOneGoods(goods);
+	if(count>0) {
+		 System.out.println("??????????");
+		 System.out.println("???????????????"+goods.getGid());
+	}
+}
+//?????????
+public static void updateGoods() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Scanner input =new Scanner(System.in);
+	System.out.println("????????????????????");
+	int gid=input.nextInt();
+	Goods goods=goodDao.findGoodsById(gid);
+	if(goods!=null) {
+		System.out.println("????????????????");
+		System.out.println(goods.toString());
+		System.out.println("???????????????????????");
+		String gname=input.next();
+		System.out.println("????????????????????");
+		BigDecimal gprice=input.nextBigDecimal();
+		System.out.println("????????????????????????");
+		String gquantity=input.next();
+		goods=new Goods();
+		goods.setGname(gname);
+		goods.setGprice(gprice);
+		goods.setGquantity(gquantity);
+		goods.setGid(gid);
+	    goodDao.updateGoods(goods);
+	}else {
+		System.out.println("????????????");
+	}
+}
+//?????????
+public static void deleteGoods() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Scanner input =new Scanner(System.in);
+	System.out.println("?????????????????????");
+	int gid=input.nextInt();
+	Goods goods=goodDao.findGoodsById(gid);
+	if(goods!=null) {
+		int count=goodDao.deleteGoods(gid);
+		if(count>0) {
+			System.out.println("????????");
+		}
+	}else {
+		System.out.println("????????????");
+	}
+}
+//??????
+public static void likeSelectGoods() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Scanner input =new Scanner(System.in);
+	System.out.println("????????????????????????");
+	String name=input.next();
+	List<Goods> list=goodDao.selectLikeGoods(name);
+	//java lambda???????
+	//	list.forEach(item->{
+	//		System.out.println(item);
+	//	});
+	//for???
+	for(int i=0;i<list.size();i++) {
+		System.out.println(list.get(i).toString());
+	}
+}
+//??????
+public static void searchGoodsIf() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Goods goods=new Goods();
+	Scanner input =new Scanner(System.in);
+	System.out.println("????????????????????????(????????)");
+	goods.setGname(input.nextLine());
+	System.out.println("?????????????????????????(????????)");
+	goods.setGquantity(input.nextLine());
+	System.out.println("?????????????????????(????????)");
+	goods.setGprice(input.nextBigDecimal());
+	List<Goods> list=goodDao.searchGoodsIf(goods);
+	for(int i=0;i<list.size();i++) {
+		System.out.println(list.get(i).toString());
+	}
+}
+//where ??????
+public static void searchGoodsWhere() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Goods goods=new Goods();
+	Scanner input =new Scanner(System.in);
+	System.out.println("????????????????????????(????????)");
+	goods.setGname(input.nextLine());
+	System.out.println("?????????????????????????(????????)");
+	goods.setGquantity(input.nextLine());
+	System.out.println("?????????????????????(????????)");
+	goods.setGprice(input.nextBigDecimal());
+	List<Goods> list=goodDao.searchGoodsWhere(goods);
+	for(int i=0;i<list.size();i++) {
+		System.out.println(list.get(i).toString());
+	}
+}
+//map??????????
+public static void searchGoodsMap() {
+	IGoodsDao goodDao=new GoodsDaoImpl();
+	Map<String,Object> map=new HashMap<String,Object>();
+	Scanner input =new Scanner(System.in);
+	System.out.println("????????????????????????(????????)");
+	map.put("gname", input.nextLine());
+	System.out.println("?????????????????????????(????????)");
+	map.put("gquantity", input.nextLine());
+	System.out.println("?????????????????????????(??0????)");
+	map.put("priceStart", input.nextInt());
+	System.out.println("????????????????????????(??0????)");
+	map.put("priceEnd", input.nextInt());
+	List<Goods> list=goodDao.searchGoodsMap(map);
+	for(int i=0;i<list.size();i++) {
+		System.out.println(list.get(i).toString());
+	}
+	
+}
+//??????
+public static void searchGoodsByPage() {
+	Scanner input =new Scanner(System.in);
+	System.out.println("??????????????");
+	int pageSize=input.nextInt();
+	System.out.println("??????????????");
+	int pageIndex=input.nextInt();
+    Map map=new HashMap();
+    //?????????
+    int startRow=(pageIndex-1)*pageSize;
+    map.put("startRow", startRow);
+    map.put("pageSize", pageSize);
+    IGoodsDao goodsDao=new GoodsDaoImpl();
+    List<Goods> list=goodsDao.searchGoodsByPage(map);
+    list.forEach(item->System.out.println(item));
+    	
+    }
+//????????
+public static void selectAllGoods() {
+	SqlSession session=MyBatisUtil.getSession();
+	IGoodsDao goodsDao=session.getMapper(IGoodsDao.class);
+	List<Goods> slist=goodsDao.findAllGoods();
+	for(int i=0;i<slist.size();i++) {
+		System.out.println(slist.get(i).toString());
+	}
+}
+//æŸ¥è¯¢ç±»åˆ«è¡¨æ—¶åŒæ—¶è¾“å‡ºå…¶å•†å“
+	public static void findGoodsByTid(){
+		IGoodsTypeDao goodsTypeDao=new GoodsTypeDaoImpl();
+		List<GoodsType> list=new ArrayList<GoodsType>();
+		list=goodsTypeDao.findGoodsById();
+		//System.out.println("å•†å“ç±»å‹ç¼–å·ï¼š"+myGoods.getTid()+"ç±»å‹åç§°"+myGoods.getTname());
+		//List<Goods> sList=myGoods.getGoods();
+		//for (int i = 0; i < sList.size(); i++) {
+		//	System.out.println(sList.get(i).toString());
+		//}
+		//System.out.println("å•†å“ç±»å‹ç¼–å·ï¼š"+list.get(0).getTid()+"    ç±»å‹åç§°: "+list.get(0).getTname());
+		for(int i = 0; i < list.size(); i++){
+			System.out.println("å•†å“ç±»å‹ç¼–å·ï¼š"+list.get(i).getTid()+"    ç±»å‹åç§°: "+list.get(i).getTname());
+			//å¾ªç¯3æ¬¡
+			for(int j=0;j<list.get(i).getGoods().size();j++){
+				//è·å¾—ç¬¬ä¸€ä¸ªgoodsé›†åˆ
+				List<Goods> sList=list.get(i).getGoods();
+				System.out.println(sList.get(j).toString());
+
+			}
+		}
+	}
+
+//æŸ¥è¯¢å•†å“è¡¨æ—¶åŒæ—¶è¾“å‡ºå…¶å•†å“ç±»å‹
+public static void searchGoodsJoinGoodsType(){
+		IGoodsDao goodsDao=new GoodsDaoImpl();
+		List<Goods> list=new ArrayList<Goods>();
+		list=goodsDao.searchGoodsJoinGoodsType();
+		for (int i = 0; i < list.size(); i++) {
+			//System.out.printf(list.get(i).toString());
+			System.out.println("å•†å“idä¸ºï¼š"+list.get(i).getGid()+" å•†å“åç§°:"+list.get(i).getGname()+"  å•†å“ä»·æ ¼ä¸ºï¼š"+
+					"  å•†å“æ•°é‡ä¸ºï¼š"+list.get(i).getGquantity()+"  å•†å“ç±»åˆ«ç¼–å·ä¸ºï¼š"+list.get(i).getGtype());
+			for (int j = 0; j < list.get(i).getGoodsTypesType().size(); j++) {
+				//è·å¾—ç¬¬ä¸€ä¸ªgoodsTypeé›†åˆ
+				List<GoodsType> slist=list.get(i).getGoodsTypesType();
+				System.out.println("ç±»åˆ«åç§°ä¸ºï¼š"+slist.get(j).getTname());
+			}
+		}
+	}
+
+//æŸ¥è¯¢1å·è®¢å•çš„æ‰€æœ‰å¯¹åº”çš„å•†å“
+	public static  void searchGoodsFromDetails(){
+		System.out.println("è¯·è¾“å…¥ä½ è¦æŸ¥è¯¢è®¢å•çš„è®¢å•å·ï¼");
+	    Scanner scan=new Scanner(System.in);
+	    int orderId=scan.nextInt();
+	    SqlSession session=MyBatisUtil.getSession();
+		OrderDetailsDao orderDao=session.getMapper(OrderDetailsDao.class);
+        List<orderDetails> orderDetailsList=orderDao.searchGoodsByDetail(orderId);
+		System.out.println("æŸ¥è¯¢åˆ°"+orderId+"å·è®¢å•çš„å•†å“æœ‰ï¼š");
+         List<Goods> goodsList=orderDetailsList.get(0).getGoods();
+			for (int i = 0; i < goodsList.size(); i++) {
+				System.out.println(" å•†å“åç§°:"+goodsList.get(i).getGname()+
+						"  å•†å“ä»·æ ¼ä¸ºï¼š"+goodsList.get(i).getGprice()+
+						"  å•†å“æ•°é‡ä¸ºï¼š"+goodsList.get(i).getGquantity());
+				for (int j = 0; j < goodsList.get(i).getGoodsTypesType().size(); j++) {
+					//è·å¾—ç¬¬ä¸€ä¸ªgoodsTypeé›†åˆ
+					List<GoodsType> slist=goodsList.get(j).getGoodsTypesType();
+					System.out.println("ç±»åˆ«åç§°ä¸ºï¼š"+slist.get(j).getTname());
+				}
+			}
+
+	}
+	//æŸ¥è¯¢è®¢å•æ¡ä»¶ä¸ºå•†å“ç¼–å·
+	public static  void searchOrderbyGoodsId(){
+		System.out.println("è¯·è¾“å…¥ä½ è¦æŸ¥è¯¢çš„å•†å“è®¢å•ï¼");
+		Scanner scan=new Scanner(System.in);
+		int goodsId=scan.nextInt();
+		SqlSession session=MyBatisUtil.getSession();
+		OrderDetailsDao orderDao=session.getMapper(OrderDetailsDao.class);
+		List<orderDetails> orderDetailsList=orderDao.searchOrderbyGoodsId(goodsId);
+		if (orderDetailsList.size()<1){
+			System.out.println("æœªèƒ½æŸ¥åˆ°ç›¸å¯¹åº”çš„è®¢å•å·");
+		}else {
+			System.out.println("æŸ¥åˆ°ç›¸å¯¹åº”çš„è®¢å•å·ä¸ºï¼š");
+			for (int i = 0; i < orderDetailsList.size(); i++) {
+				System.out.println(orderDetailsList.get(i).getOrderDetails_Orderid());
+			}
+
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
