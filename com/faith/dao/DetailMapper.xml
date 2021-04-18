@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.faith.dao.OrderDetailsDao">
+<resultMap id="DetailsMapper" type="com.faith.entity.orderDetails">
+    <id property="orderDetails_Orderid" column="orderId"/>
+    <collection property="goods" ofType="com.faith.entity.Goods">
+        <result property="gname" column="goodsname"/>
+        <result property="gprice" column="price"/>
+        <result property="gquantity" column="quantity"/>
+        <collection property="goodsTypesType" ofType="GoodsType">
+            <result property="tname" column="goodType"/>
+        </collection>
+      </collection>
+
+</resultMap>
+    <select id="searchGoodsByDetail" resultMap="DetailsMapper">
+        SELECT
+            goods.goodsname,
+            goods.price,
+            goods.quantity,
+            goodsnum.goodType,
+            order_details.orderId
+        FROM
+            order_details
+                INNER JOIN
+            goods
+            ON
+                order_details.goodsId = goods.id
+                INNER JOIN
+            goodsnum
+            ON
+                goods.gtype = goodsnum.tid
+        WHERE
+            order_details.orderId = #{orderDetails_Orderid}
+    </select>
+
+    <select id="searchOrderbyGoodsId" resultMap="DetailsMapper">
+        SELECT
+            order_details.orderId
+        FROM
+            order_details
+        WHERE order_details.goodsId=#{orderDetails_Goosid}
+    </select>
+</mapper>

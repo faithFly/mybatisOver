@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.faith.dao.IGoodsDao">
+ <resultMap type="com.faith.entity.Goods" id="goodsResultMap">
+  <id column="id" property="gid"/>
+  <result column="goodsname" property="gname"/>
+  <result column="price" property="gprice"/>
+  <result column="quantity" property="gquantity"/>
+  <result column="gtype" property="gtype"/>
+ </resultMap>
+
+ <sql id="selectAll">
+  SELECT id ,goodsname ,price ,quantity,gtype FROM `goods`
+ </sql>
+ <!-- 使用sql标签 -->
+ <select id="findAllGoods" resultMap="goodsResultMap">
+  <!-- 调用sql标签selectAll -->
+  <include refid="selectAll"/>
+ </select>
+
+ <select id="findGoodsById" parameterType="int" resultMap="goodsResultMap">
+  select * from goods where id = #{id}
+ </select>
+
+ <insert id="insert" keyProperty="gid" useGeneratedKeys="true" parameterType="com.faith.entity.Goods">
+
+  INSERT INTO `faithdb`.`goods`( `goodsname`, `price`, `quantity`)
+  VALUES (#{gname}, #{gprice}, #{gquantity});
+
+ </insert>
+
+ <update id="update" parameterType="com.faith.entity.Goods">
+  UPDATE `faithdb`.`goods` SET
+                            `goodsname` = #{gname}, `price` = #{gprice}, `quantity` = #{gquantity}
+  WHERE `id` = #{gid};
+
+ </update>
+
+ <delete id="delete" parameterType="int">
+  DELETE from goods where id=#{gid}
+ </delete>
+
+ <!-- 不建议使用concat拼接 会导致sql注入 -->
+ <select id="selectLikeGoods" resultMap="goodsResultMap">
+  SELECT id,goodsname,price,quantity
+  FROM `goods`
+  where goodsname like '%' #{gname} '%'
+ </select>
+
+ <!-- like后面标识符之间一定要加空格 例如 '%' #{gname} '%'-->
+ <select id="searchGoodsIf" resultMap="goodsResultMap" parameterType="com.faith.entity.Goods">
+  SELECT id ,goodsname ,price ,quantity FROM `goods`
+  where 1=1
+  <if test="gname!=null and gname!=''">
+   and goodsname like '%' #{gname} '%'
+  </if>
+  <if test="gprice>0">
+   and price = #{gprice}
+  </if>
+  <if test="gquantity!=null and gquantity!=''">
+   and quantity = #{gquantity}
+  </if>
+ </select>
+
+ <select id="searchGoodsWhere" resultMap="goodsResultMap" parameterType="com.faith.entity.Goods">
+  SELECT id ,goodsname ,price ,quantity FROM `goods`
+  <where>
+   <if test="gname!=null and gname!=''">
+    and goodsname like '%' #{gname} '%'
+   </if>
+   <if test="gprice>0">
+    and price = #{gprice}
+   </if>
+   <if test="gquantity!=null and gquantity!=''">
+    and quantity = #{gquantity}
+   </if>
+  </where>
+ </select>
+
+ <select id="searchGoodsMap" resultMap="goodsResultMap" parameterType="java.util.Map">
+  SELECT id ,goodsname ,price ,quantity FROM `goods`
+  <where>
+   <if test="gname!=null and gname!=''">
+    and goodsname like '%' #{gname} '%'
+   </if>
+   <if test="gquantity!=null and gquantity!=''">
+    and quantity = #{gquantity}
+   </if>
+   <if test="priceStart>0 and priceEnd>0">
+    and price between  #{priceStart} and #{priceEnd}
+   </if>
+
+  </where>
+ </select>
+
+ <select id="searchGoodsByPage" resultMap="goodsResultMap" parameterType="java.util.Map">
+  SELECT id ,goodsname ,price ,quantity FROM `goods`
+                                              limit #{startRow},#{pageSize}
+ </select>
+
+<resultMap id="GoodsMapper" type="Goods">
+ <id property="gid" column="id"/>
+ <result property="gname" column="goodsname"/>
+ <result property="gprice" column="price"/>
+ <result property="gquantity" column="quantity"/>
+ <result property="gtype" column="gtype"/>
+
+ <!--关联属性-->
+  <collection property="goodsTypesType" ofType="GoodsType">
+  <id property="tid" column="tid"/>
+  <result property="tname" column="goodType"/>
+ </collection>
+</resultMap>
+
+
+<select id="searchGoodsJoinGoodsType" resultMap="GoodsMapper">
+ SELECT
+  goods.id,
+  goods.goodsname,
+  goods.price,
+  goods.quantity,
+  goods.gtype,
+  goodsnum.tid,
+  goodsnum.goodType
+ FROM
+  goods,goodsnum
+ WHERE goods.gtype=goodsnum.tid
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ </mapper>
